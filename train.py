@@ -1,25 +1,18 @@
 # fastai
 from fastai.text import *
 
-# transformers
-from transformers import BertForSequenceClassification, BertTokenizer, BertConfig
-
 # Optimizer
 from ranger import Ranger
-from training.constants import ModelConfig, TrainingConfig
+from training.constants import ModelConfig, TrainingConfig, MODEL_CLASSES
 from training.processor import *
 from training.utils import common_utils, text_utils
 from training.models.custom_transformer import CustomTransformerModel
 
 
-
-MODEL_CLASSES = {
-    'bert': (BertForSequenceClassification, BertTokenizer, BertConfig)
-}
 model_class, tokenizer_class, config_class = MODEL_CLASSES[ModelConfig.MODEL_TYPE.value]
 
 
-def train(fine_tune=False, pre_trained=False):
+def training(fine_tune=False, pre_trained=False):
     common_utils.seed_all(TrainingConfig.SEED.value)
     transformer_tokenizer = tokenizer_class.from_pretrained(ModelConfig.PRETRAINED_MODEL.value)
     transformer_base_tokenizer = text_utils.TransformersBaseTokenizer(pretrained_tokenizer=transformer_tokenizer,
@@ -51,7 +44,7 @@ def train(fine_tune=False, pre_trained=False):
     config.num_hidden_layers = TrainingConfig.NUM_HIDDEN_LAYERS.value
     config.num_attention_heads = TrainingConfig.NUM_ATTENTION_HEADS.value
     transformer_model = model_class.from_pretrained(ModelConfig.PRETRAINED_MODEL.value, config=config)
-    custom_transformer_model = CustomTransformerModel(transformer_model=transformer_model)
+    custom_transformer_model = CustomTransformerModel(transformer_model=transformer_model, pad_idx=pad_idx)
     ranger_opt = partial(Ranger)
 
     learner = Learner(databunch,
@@ -105,4 +98,4 @@ def train(fine_tune=False, pre_trained=False):
 
 
 if __name__ == "__main__":
-    train()
+    training()
