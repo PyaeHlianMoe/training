@@ -1,5 +1,10 @@
 from enum import Enum
+from transformers import BertForSequenceClassification, BertTokenizer, BertConfig
 
+
+MODEL_CLASSES = {
+    'bert': (BertForSequenceClassification, BertTokenizer, BertConfig)
+}
 
 class ModelConfig(Enum):
     MODEL_TYPE = 'bert'
